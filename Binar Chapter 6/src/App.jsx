@@ -37,10 +37,12 @@ function App() {
   const [shops, setShops] = useState([]);
   const listMenu = ["Home", "About", "Logout"];
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // fetch data => fetch/axios
   useEffect(() => {
     const fetchShops = async () => {
+      setLoading(true);
       try {
         const response = await axios.get("http://localhost:5000/api/v1/shops");
         console.log(response);
@@ -56,6 +58,8 @@ function App() {
       } catch (error) {
         console.log(error);
         setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -63,6 +67,8 @@ function App() {
   }, []);
   return (
     <>
+      {loading && <p>loading</p>}
+
       <main className="text-center">
         {/* <header className="flex justify-between p-4 bg-white shadow-md">
         <div className="flex items-center space-x-4">
