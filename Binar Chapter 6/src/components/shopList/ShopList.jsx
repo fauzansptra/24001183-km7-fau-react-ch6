@@ -13,16 +13,14 @@ function ShopList({ shops, loading, error }) {
             alt={shop.products[0].name}
             className="w-full h-40 object-cover mb-4"
           />
-          <h3 className="font-semibold">{shop.products[0].name}</h3>
-          <p className="text-green-500 font-bold">
-            Rp{shop.products[0].price} / hari
-          </p>
+          <h3 className="font-semibold text-black">{shop.products[0].name}</h3>
+          <p className="text-green-500 font-bold">Rp{shop.products[0].price}</p>
           <p className="text-gray-600 mt-2 text-sm">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </p>
           <div className="flex items-center justify-around text-gray-500 text-sm mt-4">
-            <span>5 Star</span>
             <span>{shop.name}</span>
+            <span>5 Star</span>
           </div>
           <button className="w-full px-4 py-2 mt-4 text-white bg-green-500 rounded-md">
             Pilih Mobil

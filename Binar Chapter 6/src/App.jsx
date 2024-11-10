@@ -18,6 +18,7 @@ function App() {
       try {
         const response = await axios.get("http://localhost:3000/api/v1/shops");
         const data = response.data;
+        console.log(data);
         if (data.isSuccess) {
           setShops(data.data.shops);
         } else {
