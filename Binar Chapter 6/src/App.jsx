@@ -12,49 +12,50 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("");
 
-  useEffect(() => {
-    const fetchShops = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get("http://localhost:3000/api/v1/shops");
-        const data = response.data;
-        console.log(data);
-        if (data.isSuccess) {
-          setShops(data.data.shops);
-        } else {
-          setError("Error fetching shops");
-        }
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+  // Fetch shops with optional search and filter parameters
+  const fetchShops = async (searchTerm = "", filter = "") => {
+    setLoading(true);
+    try {
+      // Build query string based on search and filter
+      const queryParams = new URLSearchParams();
+      if (searchTerm) queryParams.append("productName", searchTerm);
+      if (filter) queryParams.append("maxPrice", filter);
+
+      const response = await axios.get(
+        `http://localhost:3000/api/v1/shops?${queryParams.toString()}`
+      );
+
+      const data = response.data;
+      if (data.isSuccess) {
+        setShops(data.data.shops);
+      } else {
+        setError("Error fetching shops");
       }
-    };
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchShops();
-  }, []);
-
-  const filteredShops = shops.filter((shop) => {
-    const matchesSearch = shop.products[0].name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-
-    const matchesFilter = filter ? shop.category === filter : true;
-
-    return matchesSearch && matchesFilter;
-  });
+  // Fetch shops on initial render and whenever search/filter changes
+  useEffect(() => {
+    fetchShops(searchTerm, filter);
+  }, [searchTerm, filter]);
 
   return (
     <>
       <Hero />
       <main className="text-center max-w-6xl mx-auto p-6">
+        {/* Search and Filter */}
         <SearchFilter
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           onFilterChange={setFilter}
         />
 
-        <ShopList shops={filteredShops} loading={loading} error={error} />
+        {/* Shop List */}
+        <ShopList shops={shops} loading={loading} error={error} />
       </main>
     </>
   );
