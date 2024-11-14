@@ -4,6 +4,17 @@ import "./App.css";
 import Hero from "./components/hero/Hero";
 import ShopList from "./components/shopList/ShopList";
 import SearchFilter from "./components/searchFilter/SearchFilter";
+import Login from "./pages/Login";
+
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import NavbarTailwind from "./components/navbarTailwind/NavbarTailwind";
+import NotFound from "./pages/NotFound";
+import Notification from "./components/Notifictaion";
 
 function App() {
   const [shops, setShops] = useState([]);
@@ -14,6 +25,12 @@ function App() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // check usernya udah login atau belum
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token);
+  }, []);
 
   const fetchShops = async (searchTerm = "", filter = "", page = 1) => {
     setLoading(true);
@@ -24,8 +41,15 @@ function App() {
       queryParams.append("page", page);
       queryParams.append("limit", itemsPerPage);
 
+      const token = localStorage.getItem("token");
+
       const response = await axios.get(
-        `http://localhost:3000/api/v1/shops?${queryParams.toString()}`
+        `http://localhost:3000/api/v1/shops?${queryParams.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const data = response.data;
@@ -52,9 +76,33 @@ function App() {
     }
   };
 
+  const handleLogin = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    setIsAuthenticated(false);
+  };
   return (
     <>
-      <Hero />
+      {/* Baru */}
+      <Router>
+        {isAuthenticated && <NavbarTailwind onLogout={handleLogin} />}
+
+        <Routes>
+          <Route
+            path="/"
+            element={isAuthenticated ? <Hero /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/login"
+            element={isAuthenticated ? <Navigate to="/" /> : <Login />}
+          />
+
+          <Route path="/*" element={<NotFound />} />
+        </Routes>
+      </Router>
+
+      {/* lama */}
+      {/* <Hero /> */}
       <main className="text-center max-w-6xl mx-auto p-6">
         <SearchFilter
           searchTerm={searchTerm}
