@@ -11,11 +11,14 @@ import {
   Routes,
   Route,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
 import NavbarTailwind from "./components/navbarTailwind/NavbarTailwind";
 import NotFound from "./pages/NotFound";
 import Notification from "./components/Notifictaion";
+import { isTokenExpired } from "../utils/auth";
 
+const navigate = useNavigate;
 function App() {
   const [shops, setShops] = useState([]);
   const [error, setError] = useState(null);
@@ -29,6 +32,12 @@ function App() {
   // check usernya udah login atau belum
   useEffect(() => {
     const token = localStorage.getItem("token");
+    if (token || isTokenExpired(token)) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      navigate("/login");
+    }
+
     setIsAuthenticated(!!token);
   }, []);
 
